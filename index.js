@@ -1,6 +1,6 @@
 const jimp = require("jimp")
 
-/* Mean */
+/* Mean filter */
 Mean = (image, n, m) => {
     console.log("mean filter")
     /* Mean filter*/ // Mean filter with the desired rows & column. Fill all filter values by: 1 / (rows×column).
@@ -21,7 +21,7 @@ Mean = (image, n, m) => {
             .write("Result/Mean.png")
     })
 }
-/* Laplacian filter*/
+/* Laplacian filter */
 Laplacian = (image, laplacianFilter) => {
     console.log("Laplacian")
     jimp
@@ -63,7 +63,48 @@ EdgeMagnit = async (link, VerticalSobelFilter, HorizontalSobelFilter) => {
     }
     newImage.write("Result/Sobel.png")
 }
+/* SobelHorizEdge */
+SobelHorizEdge = (i, HorizontalSobelFilter) => {
+    console.log("Horizontal Sobel Edge")
+    jimp
+        .read(i)
+        .then(image => image.convolute(HorizontalSobelFilter))
+        .then(image => image.write("Result/SobelHorizEdge.png"))
+}
+/* SobelVertEdge */
+SobelVertEdge = (i, VerticalSobelFilter) => {
+    console.log("Vertial Sobel Edge")
+    jimp
+        .read(i)
+        .then(image => image.convolute(VerticalSobelFilter))
+        .then(image => image.write("Result/SobelVertEdge.png"))
+}
 
+/**** THE RUN ****/
+Mean("Filters.png", 15, 15)              // calling with mean filter
+Gaussian("Filters.png", 2)               // calling Gaussian with Sigma
+const laplacianFilter = [
+    [0, -1, 0],
+    [-1, 5, -1],
+    [0, -1, 0],
+]
+Laplacian("Filters.png", laplacianFilter)  // calling Laplacian with Sigma
+const HorizontalSobelFilter = [
+    [-1, -2, -1],
+    [0, 0, 0],
+    [1, 2, 1],
+]
+SobelHorizEdge("Filters.png", HorizontalSobelFilter)    // calling SobelHorizEdge
+const VerticalSobelFilter = [
+    [-1, 0, 1],
+    [-2, 0, 2],
+    [-1, 0, 1],
+]
+SobelVertEdge("Filters.png", VerticalSobelFilter)   // calling SobelVertEdge
+EdgeMagnit("Filters.png", VerticalSobelFilter, HorizontalSobelFilter) // calling EdgeMagnit
+
+
+// Linear didn't work
 // const laplacianFilter = [
 //     [0, -1, 0],
 //     [-1, 5, -1],
@@ -85,28 +126,3 @@ EdgeMagnit = async (link, VerticalSobelFilter, HorizontalSobelFilter) => {
 //     Laplacian(i, filter)             // calling Laplacian with Sigma
 //     EdgeMagnit(i, VerticalSobelFilter, HorizontalSobelFilter)            // calling EdgeMagnit
 // }
-
-
-
-
-
-/**** THE RUN ****/
-Mean("Filters.png", 15, 15)              // calling with mean filter
-Gaussian("Filters.png", 2)               // calling Gaussian with Sigma
-const laplacianFilter = [
-    [0, -1, 0],
-    [-1, 5, -1],
-    [0, -1, 0],
-]
-Laplacian("Filters.png", laplacianFilter)  // calling Laplacian with Sigma
-const HorizontalSobelFilter = [
-    [-1, -2, -1],
-    [0, 0, 0],
-    [1, 2, 1],
-]
-const VerticalSobelFilter = [
-    [-1, 0, 1],
-    [-2, 0, 2],
-    [-1, 0, 1],
-]
-EdgeMagnit("Filters.png", VerticalSobelFilter, HorizontalSobelFilter)            // calling EdgeMagnit
