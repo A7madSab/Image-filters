@@ -1,0 +1,12 @@
+{
+  "name": "task-2",
+  "version": "1.0.0",
+  "description": "Image Processing using JS",
+  "main": "index.js",
+  "author": "Ahmad Sabry Aly",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "jimp": "^0.8.5"
+  }
+}
