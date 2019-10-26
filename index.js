@@ -50,6 +50,42 @@ Gaussian = async (i, sigma) => {
         .write('Result.png');
 }
 
+/* Sobel  filter */
+Sobel = async (link) => {
+    const HorizontalSobelFilter = [
+        [-1, -2, -1],
+        [0, 0, 0],
+        [1, 2, 1],
+    ]
+    const VerticalSobelFilter = [
+        [-1, 0, 1],
+        [-2, 0, 2],
+        [-1, 0, 1],
+    ]
+    const vertical = await jimp
+        .read(link)
+        .then(image => image.convolute(VerticalSobelFilter))
+    const horizontal = await jimp
+        .read(link)
+        .then(image => image.convolute(HorizontalSobelFilter))
+
+    vertical.write("VerticalSobel.png")
+    horizontal.write("HorizontalSobel.png")
+
+    const { width, height } = vertical.bitmap
+    const newImage = new jimp(width, height)
+
+    let color
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            color = horizontal.getPixelColor(x, y) > vertical.getPixelColor(x, y) ? horizontal.getPixelColor(x, y) : vertical.getPixelColor(x, y)
+            newImage.setPixelColor(color, x, y)
+        }
+    }
+    newImage.write("Sobel.png")
+}
+
 // Mean("Filters.png", meanFilter)                  // calling with mean filter
 // Gaussian("Filters.png", sigma)                   // calling Gaussian with Sigma
-// Laplacian("Filters.png", laplacianFilter)           // calling Laplacian with Sigma
+// Laplacian("Filters.png", laplacianFilter)        // calling Laplacian with Sigma
+// Sobel("Filters.png")                             // calling Sobel
