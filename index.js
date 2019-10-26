@@ -1,62 +1,46 @@
 const jimp = require("jimp")
 
-/* Mean Filter */
-// Mean filter with the desired rows & column. Fill all filter values by: 1 / (rows×column).
-const meanFilterColumnSize = 15
-const meanFilterRowSize = 15
-// creating the filter with the size above
-const meanFilter = new Array(meanFilterRowSize)
-for (let i = 0; i < meanFilterRowSize; i++) {
-    meanFilter[i] = new Array(meanFilterColumnSize);
-    for (let j = 0; j < meanFilterColumnSize; j++) {
-        meanFilter[i][j] = 1 / (meanFilterColumnSize * meanFilterColumnSize)
+/* Mean */
+Mean = (image, n, m) => {
+    console.log("mean filter")
+    /* Mean filter*/ // Mean filter with the desired rows & column. Fill all filter values by: 1 / (rows×column).
+    const meanFilterColumnSize = n
+    const meanFilterRowSize = m
+    // creating the filter with the size above
+    const meanFilter = new Array(meanFilterRowSize)
+    for (let i = 0; i < meanFilterRowSize; i++) {
+        meanFilter[i] = new Array(meanFilterColumnSize);
+        for (let j = 0; j < meanFilterColumnSize; j++) {
+            meanFilter[i][j] = 1 / (meanFilterColumnSize * meanFilterColumnSize)
+        }
     }
-}
-
-/* Laplacian filter*/
-Laplacian = (image) => {
-    const laplacianFilter = [
-        [0, -1, 0],
-        [-1, 5, -1],
-        [0, -1, 0],
-    ]
-    jimp
-        .read(image)
-        .then(image => image.convolute(laplacianFilter))
-        .then(image => image.write("Result.png"))
-}
-
-/* Mean filter*/
-Mean = (image, filter, postProcessing) => {
     jimp.read(image, (err, image) => {
         if (err) throw err;
         image
-            .convolute(filter)
-            .write("Result.png")
+            .convolute(meanFilter)
+            .write("Result/Mean.png")
     })
 }
-
+/* Laplacian filter*/
+Laplacian = (image, laplacianFilter) => {
+    console.log("Laplacian")
+    jimp
+        .read(image)
+        .then(image => image.convolute(laplacianFilter))
+        .then(image => image.write("Result/Laplacian.png"))
+}
 /* Gaussian filter */ // Very hard to create the mask using the formula programmatically so I using a build in function.
 Gaussian = async (i, sigma) => {
-    const sigma = 16
+    console.log("Gaussian")
     const image = await jimp.read(i);
     image
         .gaussian(sigma)
-        .write('Result.png');
+        .write('Result/Gaussian.png');
 }
-
 /* EdgeMagnit filter */
-EdgeMagnit = async (link) => {
-    const HorizontalSobelFilter = [
-        [-1, -2, -1],
-        [0, 0, 0],
-        [1, 2, 1],
-    ]
-    const VerticalSobelFilter = [
-        [-1, 0, 1],
-        [-2, 0, 2],
-        [-1, 0, 1],
-    ]
+EdgeMagnit = async (link, VerticalSobelFilter, HorizontalSobelFilter) => {
+    console.log("EdgeMagnit, sobel vertial, sobel horizontal")
+
     const vertical = await jimp
         .read(link)
         .then(image => image.convolute(VerticalSobelFilter))
@@ -64,8 +48,8 @@ EdgeMagnit = async (link) => {
         .read(link)
         .then(image => image.convolute(HorizontalSobelFilter))
 
-    vertical.write("VerticalSobel.png")
-    horizontal.write("HorizontalSobel.png")
+    vertical.write("Result/VerticalSobel.png")
+    horizontal.write("Result/HorizontalSobel.png")
 
     const { width, height } = vertical.bitmap
     const newImage = new jimp(width, height)
@@ -77,10 +61,52 @@ EdgeMagnit = async (link) => {
             newImage.setPixelColor(color, x, y)
         }
     }
-    newImage.write("Sobel.png")
+    newImage.write("Result/Sobel.png")
 }
 
-// Mean("Filters.png", meanFilter)      // calling with mean filter
-// Gaussian("Filters.png")              // calling Gaussian with Sigma
-// Laplacian("Filters.png")             // calling Laplacian with Sigma
-// EdgeMagnit("Filters.png")            // calling EdgeMagnit
+// const laplacianFilter = [
+//     [0, -1, 0],
+//     [-1, 5, -1],
+//     [0, -1, 0],
+// ]
+// const HorizontalSobelFilter = [
+//     [-1, -2, -1],
+//     [0, 0, 0],
+//     [1, 2, 1],
+// ]
+// const VerticalSobelFilter = [
+//     [-1, 0, 1],
+//     [-2, 0, 2],
+//     [-1, 0, 1],
+// ]
+// LinearFilter = async (i, filter, filter2) => {
+//     Mean(i, filter, filter2)          // calling with mean filter
+//     Gaussian(i, filter.length)          // calling Gaussian with Sigma
+//     Laplacian(i, filter)             // calling Laplacian with Sigma
+//     EdgeMagnit(i, VerticalSobelFilter, HorizontalSobelFilter)            // calling EdgeMagnit
+// }
+
+
+
+
+
+/**** THE RUN ****/
+Mean("Filters.png", 15, 15)              // calling with mean filter
+Gaussian("Filters.png", 2)               // calling Gaussian with Sigma
+const laplacianFilter = [
+    [0, -1, 0],
+    [-1, 5, -1],
+    [0, -1, 0],
+]
+Laplacian("Filters.png", laplacianFilter)  // calling Laplacian with Sigma
+const HorizontalSobelFilter = [
+    [-1, -2, -1],
+    [0, 0, 0],
+    [1, 2, 1],
+]
+const VerticalSobelFilter = [
+    [-1, 0, 1],
+    [-2, 0, 2],
+    [-1, 0, 1],
+]
+EdgeMagnit("Filters.png", VerticalSobelFilter, HorizontalSobelFilter)            // calling EdgeMagnit
